@@ -4,14 +4,14 @@ from typing import Optional
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 import stripe
 import os
 from datetime import datetime
 
 import uuid
 from db.session import get_db
-from db.models import Booking, Barber, Services
+from db.models import Booking, Barber, Services, PaymentStatus
 from dependencies import get_arq_pool
 
 router = APIRouter()
@@ -41,8 +41,41 @@ async def create_payment(
         # Strip timezone info to compare against naive datetime.now()
         if booking_dt.tzinfo is not None:
             booking_dt = booking_dt.replace(tzinfo=None)
+        
+        # Immediate error for past dates
         if booking_dt < datetime.now():
             raise HTTPException(status_code=400, detail="Booking datetime must be in the future")
+
+        # Business rules: 9 AM - 6 PM, 0 or 30 mins
+        is_valid = (9 <= booking_dt.hour < 18) and (booking_dt.minute in [0, 30])
+        
+        if is_valid:
+            # Availability Check
+            target_barber_id = data.get("barber_id")
+            if target_barber_id:
+                # Check specific barber
+                stmt = select(Booking).where(
+                    Booking.barber_id == target_barber_id,
+                    Booking.booking_datetime == booking_dt,
+                    Booking.payment_status.in_([PaymentStatus.PENDING, PaymentStatus.SUCCESSFUL])
+                )
+                if (await db.execute(stmt)).first():
+                    is_valid = False
+            else:
+                # Check if any barber is free
+                barbers_count = (await db.execute(select(func.count(Barber.id)))).scalar() or 0
+                taken_count = (await db.execute(
+                    select(func.count(Booking.id)).where(
+                        Booking.booking_datetime == booking_dt,
+                        Booking.payment_status.in_([PaymentStatus.PENDING, PaymentStatus.SUCCESSFUL])
+                    )
+                )).scalar() or 0
+                if taken_count >= barbers_count:
+                    is_valid = False
+        
+        if not is_valid:
+            booking_dt = None
+
     data["booking_datetime"] = booking_dt
 
     try:

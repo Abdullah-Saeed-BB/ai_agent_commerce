@@ -32,6 +32,7 @@ function PaymentContent() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/booking/${id}`,
       );
       if (!res.ok) {
+        console.log(res.body);
         throw new Error("Failed to load booking");
       }
       const data = await res.json();

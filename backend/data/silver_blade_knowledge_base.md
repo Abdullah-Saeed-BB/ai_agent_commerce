@@ -6,13 +6,13 @@
 
 ## Location & Contact
 
-- Address: 123 Heritage Way, Downtown District, City Center
-- Instagram Handle: @SilverBladeBarber
+- Address (Where the barbershop is): 123 Heritage Way, Downtown District, City Center
+- Instagram Handle (Barber Instagram account): @silverblade_1
 - Booking Method: Instagram DM (Automated AI Assistant)
 
 ## Operating Hours
 
-- Monday - Saturday: 09:00 AM - 08:00 PM
+- Monday - Saturday: 10:00 AM - 06:00 PM
 - Sunday: Closed
 
 ## Booking Policies & FAQ
