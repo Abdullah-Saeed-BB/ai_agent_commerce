@@ -44,7 +44,11 @@ app.add_middleware(
 )
 
 
-from routers import booking, webhook, test
+from routers import webhook
+
+@app.get("/test")
+def test():
+    return {"message": "Hello World"}
 
 # app.include_router(test.router, prefix="/test", tags=["test"])
 # app.include_router(booking.router, prefix="/booking", tags=["booking"])
