@@ -28,4 +28,5 @@ dependencies = [
     "langchain-chroma>=1.1.0",
     "sentence-transformers>=5.4.1",
     "langchain-huggingface>=1.2.2",
+    "python-telegram-bot>=22.7",
 ]
