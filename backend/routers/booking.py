@@ -12,7 +12,7 @@ import os
 
 from db.session import get_db
 from db.models import Booking, Barber, Services, PaymentStatus
-from services.get_slots import generate_slots
+from services.booking_service import get_availability as get_service_availability
 
 router = APIRouter()
 
@@ -45,8 +45,6 @@ async def get_barbers(db: AsyncSession = Depends(get_db)):
 
 
 # ── GET /booking/availability ──────────────────────────────────────────────────
-from collections import defaultdict
-
 @router.get("/availability")
 async def get_availability(
     date: date,
@@ -57,52 +55,11 @@ async def get_availability(
     Return available 30-minute slots for a given date.
     Returns a list of objects containing the time and names of available barbers.
     """
-    all_slots = generate_slots()
-
-    # 1. Fetch all active barbers
-    barber_stmt = select(Barber)
-    if barber_id:
-        barber_stmt = barber_stmt.where(Barber.id == barber_id)
+    availability = await get_service_availability(db, date, date, barber_id)
     
-    barbers_result = await db.execute(barber_stmt)
-    active_barbers = barbers_result.scalars().all()
-    
-    # Create a lookup for barber names by ID
-    barber_lookup = {b.id: b.name for b in active_barbers}
-
-    # 2. Fetch existing bookings
-    stmt = (
-        select(Booking)
-        .where(func.date(Booking.booking_datetime) == date)
-        .where(Booking.payment_status.in_([PaymentStatus.PENDING, PaymentStatus.SUCCESSFUL]))
-        .where(Booking.payment_id != None)
-    )
-    result = await db.execute(stmt)
-    bookings = result.scalars().all()
-
-    # 3. Create a map of {time: [list_of_booked_barber_ids]}
-    booked_map = defaultdict(set)
-    for b in bookings:
-        time_key = b.booking_datetime.time()
-        booked_map[time_key].add(b.barber_id)
-
-    # 4. Build the structured response
     available_data = []
-    
-    for slot_time in all_slots:
-        # Filter out barbers who are already booked at this specific time
-        free_barbers = [
-            {"id": b_id, "name": b_name}
-            for b_id, b_name in barber_lookup.items()
-            if b_id not in booked_map[slot_time]
-        ]
-
-        # Only add the slot if there is at least one barber free
-        if free_barbers:
-            available_data.append({
-                "time": slot_time.strftime("%H:%M"),
-                "available_barbers": free_barbers
-            })
+    if availability:
+        available_data = availability[0]["available_slots"]
 
     return {
         "date": date,
@@ -207,8 +164,16 @@ async def update_booking(
             if not barber:
                 raise HTTPException(status_code=404, detail="Barber not found")
             
-            is_barber_free = (await db.execute(select(Booking).where(Booking.barber_id == barber.id, Booking.booking_datetime == booking.booking_datetime)))
-            if is_barber_free:
+            # Check if another booking exists for this barber at the same time
+            existing_booking = (await db.execute(
+                select(Booking).where(
+                    Booking.barber_id == barber.id,
+                    Booking.booking_datetime == booking.booking_datetime,
+                    Booking.id != booking.id
+                )
+            )).scalars().first()
+            
+            if existing_booking:
                 raise HTTPException(status_code=400, detail="Barber is not free at the selected time")
 
             booking.barber_id = barber.id
