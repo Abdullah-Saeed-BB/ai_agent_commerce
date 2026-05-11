@@ -29,4 +29,5 @@ dependencies = [
     "sentence-transformers>=5.4.1",
     "langchain-huggingface>=1.2.2",
     "python-telegram-bot>=22.7",
+    "matplotlib>=3.10.9",
 ]

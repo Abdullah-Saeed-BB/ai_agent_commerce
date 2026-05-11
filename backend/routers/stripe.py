@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.post("/stripe")
-async def webhook(request: Request, db: AsyncSession = Depends(get_db)):
+async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     """
     Handle Stripe webhook events.
     - payment_intent.succeeded  → mark booking SUCCESSFUL and generate PDF bill
