@@ -1,30 +1,55 @@
+import time
+
+print("=" * 30)
+print("Application building AI Agent process")
+print("=" * 30 + "\n")
+
+s_time = time.time()
+print("Start loading LangGraph ... ", end="")
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
+print(f"Takes {time.time() - s_time:.1f}s")
+
+s_time = time.time()
+print("Start loading LangChain ... ", end="")
 from langchain_core.runnables import Runnable
 from langchain_core.messages import BaseMessage, ToolMessage, SystemMessage, HumanMessage, AIMessage
 from langchain_core.tools import tool
 from langchain.chat_models import init_chat_model
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode
-from typing import Annotated, Sequence, TypedDict, List, Dict, Optional, Literal, Union
+print(f"Takes {time.time() - s_time:.1f}s")
 
+
+
+s_time = time.time()
+print("Start importing other stuff ... ", end="")
+from typing import Annotated, Sequence, TypedDict, List, Dict, Optional, Literal, Union
 from sqlalchemy import text, select, and_
 from pathlib import Path
 import datetime
 import pandas as pd
 import chromadb
 import os
+print(f"Takes {time.time() - s_time:.1f}s")
 
 
+s_time = time.time()
+print("Start importing DB stuff ... ", end="")
 from db.session import AsyncSessionLocal
 from db.models import Booking, Barber
 from services.booking_service import get_availability, create_booking
+print(f"Takes {time.time() - s_time:.1f}s")
 
 from dotenv import load_dotenv
 load_dotenv()
 
+
+s_time = time.time()
+print("Start loading vector database ... ", end="")
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 BASE_DIR = Path(__file__).parent
 
@@ -36,17 +61,24 @@ VDB_PORT = os.getenv("VDB_PORT")
 
 client = chromadb.HttpClient(host=VDB_HOST, port=VDB_PORT)
 
-print("Loading embedding function locally ...")
-embedding_function = HuggingFaceEmbeddings(model=str(MODEL_PATH))
+# print("Loading embedding function locally ...")
 
-print("Creating Vector Store ...")
+embedding_function = HuggingFaceEmbeddings(
+    model=str(MODEL_PATH),
+    
+)
+
+# print("Creating Vector Store ...")
 vector_store = Chroma(
     client=client,
     persist_directory=PERSIST_DIRECTORY,
     collection_name="silver-blade-vdb",
     embedding_function=embedding_function
 )
+print(f"Takes {time.time() - s_time:.1f}s")
 
+s_time = time.time()
+print("Start loading AI Agent tools ... ", end="")
 @tool
 def retriever_tool(
     filter: Union[Literal["barber", "service", "business_info"], None], query: str) -> str:
@@ -244,20 +276,25 @@ async def booking_tool(
 
     payment_url = f"{os.getenv("FRONTEND_URL")}/payment?id={new_booking.id}"
     if not missing_info:
-        return f"*Creating booking successed*, just need to confirm the pay.\n\n[Payment page]({payment_url})"
+        return f"*Creating booking successed*, just need to confirm the pay\.\n\n[Payment page]({payment_url})"
     else:
         readable_missing = \
             f"{", ".join(missing_info[:-1])}, and {missing_info[-1]}" 
-        return f"*Creating booking successed*, you have to enter {readable_missing} in payment page before confirming the pay.\n\n[Payment Page]({payment_url})"
+        return f"*Creating booking successed*, you have to enter {readable_missing} in payment page before confirming the pay\`.\n\n[Payment Page]({payment_url})"
+print(f"Takes {time.time() - s_time:.1f}s")
 
-
+s_time = time.time()
+print("Start loading LLM ... ", end="")
 # Initilization the AI Agent
 llm = init_chat_model(
     model="openai/gpt-oss-120b",
     model_provider="groq",
     temperature=0
 )
+print(f"Takes {time.time() - s_time:.1f}s")
 
+s_time = time.time()
+print("Start building AI Agent ... ", end="")
 class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
 
@@ -299,5 +336,14 @@ graph.add_conditional_edges(
     should_continue,
     {"agent": "agent", END: END}
 )
+print(f"Takes {time.time() - s_time:.1f}s")
 
+s_time = time.time()
+print(f"Compiling AI Agent ... ", end="")
 app: CompiledStateGraph = graph.compile()
+print(f"Takes {time.time() - s_time:.1f}s")
+
+
+print(f"\n" + "=" * 30)
+print("AI Agent Compiled Successfully!")
+print(f"=" * 30 + "\n")

@@ -12,7 +12,6 @@ from datetime import datetime
 import uuid
 from db.session import get_db
 from db.models import Booking, Barber, Services
-from dependencies import get_arq_pool
 
 router = APIRouter()
 
@@ -26,6 +25,9 @@ class BillData(BaseModel):
     name: Optional[str] = None
     barber_id: Optional[uuid.UUID] = None
 
+
+def get_arq_pool(request: Request):
+    return request.app.state.arq_pool
 
 @router.post("/create-payment")
 async def create_payment(
