@@ -13,9 +13,11 @@ load_dotenv(os.path.join(backend_dir, ".env"))
 sys.path.insert(0, os.path.abspath(os.path.join(backend_dir, "..")))
 
 from models import Base
+# pyrefly: ignore [missing-import]
 from session import engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
+# pyrefly: ignore [missing-import]
 from session import make_database_url
 import pandas as pd
 
