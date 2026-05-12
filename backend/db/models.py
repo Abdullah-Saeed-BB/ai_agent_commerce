@@ -4,6 +4,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from enum import Enum
 import uuid
+from typing import List
 
 class Base(DeclarativeBase):
     """Shared declarative base — import this in every model file."""
@@ -14,6 +15,10 @@ class PaymentStatus(str, Enum):
     SUCCESSFUL = "SUCCESSFUL"
     FAILED = "FAILED"
     CANCELED = "CANCELED"
+
+class ConversationRole(str, Enum):
+    USER = "USER"
+    AI = "AI"
 
 class Services(Base):
     __tablename__ = "services"
@@ -82,3 +87,22 @@ class Booking(Base):
 
     def __repr__(self) -> str:
         return f"<Booking(customer={self.customer_name}, status={self.payment_status})>"
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=func.gen_random_uuid()
+    )
+    chatid: Mapped[str] = mapped_column(String(100), nullable=False)
+    content: Mapped[str] = mapped_column(String, nullable=False)
+    role: Mapped[ConversationRole] = mapped_column(
+        SqlEnum(ConversationRole),
+        nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    def __repr__(self) -> str:
+        return f"<Conversation(chatid={self.chatid}, role={self.role})>"
