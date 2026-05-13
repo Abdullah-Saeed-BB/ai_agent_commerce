@@ -10,6 +10,7 @@ from telegram.ext import (
 )
 import os
 from ai_agent import get_agent
+import requests
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -18,6 +19,22 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_WEBHOOK_URL = os.getenv("TELEGRAM_WEBHOOK_URL")
 
 ptb = Application.builder().token(TELEGRAM_TOKEN).build() 
+
+
+def send_bill_to_telegram(chat_id, pdf_buffer, filename="invoice.pdf"):
+    token = os.getenv("TELEGRAM_TOKEN")
+    url = f"https://api.telegram.org/bot{token}/sendDocument"
+    
+    files = {
+        'document': (filename, pdf_buffer, 'application/pdf')
+    }
+    data = {
+        'chat_id': chat_id,
+        'caption': "Here is your booking receipt from Silver Blade! ✂️"
+    }
+    
+    response = requests.post(url, data=data, files=files)
+    return response.json()
 
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     agent_app = get_agent()
@@ -29,7 +46,8 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conv = await load_conversation(chat_id)
 
     res = await agent_app.ainvoke({
-        "messages": conv + [HumanMessage(content=text)]
+        "messages": conv + [HumanMessage(content=text)],
+        "telegram_chatid": str(chat_id)
     })
     ai_response = res["messages"][-1].content
 
@@ -52,7 +70,8 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parsed_response = ai_response.\
             replace("<b>", "").replace("</b>", "").\
             replace("<i>", "").replace("</i>", "").\
-            replace("<br/>", "").replace("<br>", "").\
+            replace("<br/>", "\n").replace("</br>", "\n").\
+            replace("<br>", "\n").\
             replace("<a>", "").replace("</a>", "").\
             replace("<u>", "").replace("</u>", "")
         await context.bot.send_message(

@@ -1,3 +1,4 @@
+from langgraph.prebuilt import InjectedState
 from langgraph.graph.state import CompiledStateGraph
 class AIAgent:
     def __init__(self):
@@ -82,6 +83,10 @@ class AIAgent:
 
         s_time = time.time()
         print("Start loading AI Agent tools ... ", end="")
+        class AgentState(TypedDict):
+            messages: Annotated[Sequence[BaseMessage], add_messages]
+            telegram_chatid: str
+
         @tool
         def retriever_tool(
             filter: Union[Literal["barber", "service", "business_info"], None], query: str) -> str:
@@ -193,6 +198,7 @@ class AIAgent:
 
         @tool
         async def booking_tool(
+            state: Annotated[dict, InjectedState],
             name: str | None = None,
             booking_datetime: str | None = None,
             service: str | None = None,
@@ -271,7 +277,8 @@ class AIAgent:
                         booking_datetime=validated_data["booking_datetime"],
                         service_id=validated_data["service_id"],
                         barber_id=validated_data["barber_id"],
-                        payment_id=None
+                        payment_id=None,
+                        telegram_chatid=state.get("telegram_chatid")
                     )
             except Exception as e:
                 print(e)
@@ -300,8 +307,6 @@ class AIAgent:
 
         s_time = time.time()
         print("Start building AI Agent ... ", end="")
-        class AgentState(TypedDict):
-            messages: Annotated[Sequence[BaseMessage], add_messages]
 
         tools = [find_free_times_tool, retriever_tool, booking_tool]
 

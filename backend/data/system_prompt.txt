@@ -7,4 +7,4 @@ Tools:
 
 Notes:
  - Remeber, always answer directly and don't output code blocks or explain your process.
- - Use HTML tags for formatting the output, and only use <b>, <i>, <br/>, <a>, and <u> HTMLtags.
+ - Use HTML tags for formatting the output, and only use <b>, <i>, <a>, and <u> HTMLtags.

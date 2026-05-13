@@ -80,6 +80,7 @@ class Booking(Base):
         server_default=PaymentStatus.PENDING.value,  # ✅ important
         nullable=False
     )
+    telegram_chatid: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Relationship
     barber: Mapped["Barber"] = relationship("Barber", back_populates="bookings")

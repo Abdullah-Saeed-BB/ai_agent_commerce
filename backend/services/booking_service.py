@@ -93,6 +93,7 @@ async def create_booking(
     service_id: Optional[uuid.UUID] = None,
     barber_id: Optional[uuid.UUID] = None,
     payment_id: Optional[str] = None,
+    telegram_chatid: Optional[str] = None,
     arq_pool=None
 ) -> Booking:
     """
@@ -104,6 +105,7 @@ async def create_booking(
         barber_id=barber_id,
         booking_datetime=booking_datetime,
         customer_name=customer_name,
+        telegram_chatid=telegram_chatid
     )
     db.add(new_booking)
     await db.commit()
