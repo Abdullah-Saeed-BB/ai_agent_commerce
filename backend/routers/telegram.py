@@ -1,20 +1,15 @@
 from services.conversation import load_conversation, save_conversation
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage
 from fastapi import APIRouter, Request, Response
-from sqlalchemy import select
 from telegram import Update
 from telegram.ext import (
     Application, 
-    CommandHandler, 
     MessageHandler, 
     filters, 
     ContextTypes
 )
 import os
-from ai_agent import app as agent_app
-
-from db.session import AsyncSessionLocal
-from db.models import Conversation, ConversationRole
+from ai_agent import get_agent
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -25,13 +20,13 @@ TELEGRAM_WEBHOOK_URL = os.getenv("TELEGRAM_WEBHOOK_URL")
 ptb = Application.builder().token(TELEGRAM_TOKEN).build() 
 
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    agent_app = get_agent()
+
     text = update.message.text
     username = update.effective_user.username
     chat_id = update.effective_chat.id
 
     conv = await load_conversation(chat_id)
-
-    print("Conversation:\n", conv)
 
     res = await agent_app.ainvoke({
         "messages": conv + [HumanMessage(content=text)]
@@ -50,66 +45,20 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=chat_id,
             text=ai_response,
-            parse_mode="MarkdownV2"
+            parse_mode="HTML"
         )
     except Exception as e:
         print(f"Error sending message: {e}")
+        parsed_response = ai_response.\
+            replace("<b>", "").replace("</b>", "").\
+            replace("<i>", "").replace("</i>", "").\
+            replace("<br/>", "").replace("<br>", "").\
+            replace("<a>", "").replace("</a>", "").\
+            replace("<u>", "").replace("</u>", "")
         await context.bot.send_message(
             chat_id=chat_id,
-            text=ai_response
-        )    
-
-
-    ################################################
-    # response = fr"Hi you \({text[:10]}\.\.\.\) this it title _What_ **I** can *do* for you"
-
-    # print(f"Received message '{text}' from {username} in chat {chat_id}")
-
-    # async with AsyncSessionLocal() as session:
-    #     # Retrieve history
-    #     stmt = select(Conversation).\
-    #         where(Conversation.chatid == str(chat_id)).\
-    #         order_by(Conversation.created_at.desc()).\
-    #         limit(7)
-            
-    #     result = await session.execute(stmt)
-    #     history = result.scalars().all()
-        
-    #     print(f"--- Conversation History for {chat_id} ---")
-    #     for msg in history:
-    #         print(f"[{msg.created_at.strftime('%b, %d %H:%M:%S')}] {msg.role}: {msg.content}")
-    #     print("--- End of History ---")
-
-    #     # Save User Message
-    #     user_msg = Conversation(
-    #         chatid=str(chat_id),
-    #         content=text,
-    #         role=ConversationRole.USER
-    #     )
-    #     session.add(user_msg)
-        
-    #     # Save AI Message
-    #     ai_msg = Conversation(
-    #         chatid=str(chat_id),
-    #         content=response,
-    #         role=ConversationRole.AI
-    #     )
-    #     session.add(ai_msg)
-        
-    #     await session.commit()
-
-    # try:
-    #     await context.bot.send_message(
-    #         chat_id=chat_id,
-    #         text=response,
-    #         parse_mode="MarkdownV2"
-    #     )
-    # except Exception as e:
-    #     print(f"Error sending message: {e}")
-    #     await context.bot.send_message(
-    #         chat_id=chat_id,
-    #         text=response
-    #     )
+            text=parsed_response
+        )  
 
 ptb.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_response))
 
