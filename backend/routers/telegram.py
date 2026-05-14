@@ -21,6 +21,8 @@ print("telegram webhook:", TELEGRAM_WEBHOOK_URL)
 
 ptb = Application.builder().token(TELEGRAM_TOKEN).build() 
 
+def clean_br_tag(text: str):
+    return text.replace("<br/>", "\n").replace("<br>", "\n").replace("</br>", "\n")
 
 def send_bill_to_telegram(chat_id, pdf_buffer, filename="invoice.pdf"):
     token = TELEGRAM_TOKEN
@@ -67,8 +69,8 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ai_response = res["messages"][-1].content
 
     new_messages = [
-        {"content": text, "role": "USER"},
-        {"content": ai_response, "role": "AI"}
+        {"content": ai_response, "role": "AI"},
+        {"content": text, "role": "USER"}
     ]
     is_saved = await save_conversation(chat_id, new_messages)
     

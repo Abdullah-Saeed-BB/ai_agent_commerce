@@ -155,7 +155,6 @@ class AIAgent:
                 try:
                     from routers.telegram import send_photo_to_telegram
                     img_buffer = generate_schedule_image(availability_data)
-                    caption = f"These are free times {'at ' + start if start == end else 'from ' + start + ' to ' + end} 📅"
                     send_photo_to_telegram(chat_id, img_buffer, filename="schedule.png")
                 except Exception as e:
                     print(f"Failed to generate or send schedule image: {e}")
@@ -277,12 +276,12 @@ class AIAgent:
 
             payment_url = f"{os.getenv("FRONTEND_URL")}/payment?id={new_booking.id}"
             if not missing_info:
-                return fr"<b>Creating booking successed</b>, just need to confirm the pay.\n\n<a href='{payment_url}'>Payment page</a>"
+                return f"<b>Creating booking successed</b>, just need to confirm the pay.\n\n<a href='{payment_url}'>Payment page</a>"
                 # return fr"*Creating booking successed*, just need to confirm the pay\.\n\n[Payment page]({payment_url})"
             else:
                 readable_missing = \
                     f"{", ".join(missing_info[:-1])}, and {missing_info[-1]}" 
-                return fr"<b>Creating booking successed</b>, you have to enter {readable_missing} in payment page before confirming the pay.\n\n<a href='{payment_url}'>Payment Page</a>"
+                return f"<b>Creating booking successed</b>, you have to enter {readable_missing} in payment page before confirming the pay.\n\n<a href='{payment_url}'>Payment Page</a>"
                 # return fr"*Creating booking successed*, you have to enter {readable_missing} in payment page before confirming the pay\`.\n\n[Payment Page]({payment_url})"
         print(f"Takes {time.time() - s_time:.1f}s")
 
