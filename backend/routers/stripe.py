@@ -1,3 +1,5 @@
+from routers.telegram import send_bill_to_telegram
+from services.generate_bill import generate_bill_buffer
 import os
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -7,7 +9,6 @@ from sqlalchemy.orm import selectinload
 
 from db.session import get_db
 from db.models import Booking, PaymentStatus
-from services.generate_bill import generate_bill
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -52,19 +53,27 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
             booking.payment_status = PaymentStatus.SUCCESSFUL
 
             # Generate PDF bill (non-fatal if it fails)
-            try:
-                generate_bill(
-                    filename=f"./bills/{str(booking.id)[:8]}.pdf",
-                    barber_name=booking.barber.name if booking.barber else "N/A",
-                    booking_datetime=booking.booking_datetime,
-                    service_name=booking.service.name if booking.service else "N/A",
-                    price=booking.service.price if booking.service else 0,
-                    payment_status=booking.payment_status.value,
-                    customer_name=booking.customer_name or "N/A",
-                    booking_id=booking.id,
-                )
-            except Exception as bill_err:
-                print(f"[Webhook] Bill generation failed: {bill_err}")
+            if booking.telegram_chatid:
+                try:
+                    buffer = generate_bill_buffer(
+                        barber_name=booking.barber.name if booking.barber else "N/A",
+                        booking_datetime=booking.booking_datetime,
+                        service_name=booking.service.name if booking.service else "N/A",
+                        price=booking.service.price if booking.service else 0,
+                        payment_status=booking.payment_status.value,
+                        customer_name=booking.customer_name or "N/A",
+                        booking_id=booking.id,
+                    )
+
+                    filename = f"{booking.customer_name.lower().replace(" ", "_")}_invoice_silver_blade.pdf"
+
+                    send_bill_to_telegram(
+                        chat_id=booking.telegram_chatid,
+                        pdf_buffer=buffer,
+                        filename=filename
+                    )
+                except Exception as bill_err:
+                    print(f"[Webhook] Bill generation failed: {bill_err}")
 
             await db.commit()
 

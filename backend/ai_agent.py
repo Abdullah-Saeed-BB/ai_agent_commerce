@@ -286,12 +286,12 @@ class AIAgent:
 
             payment_url = f"{os.getenv("FRONTEND_URL")}/payment?id={new_booking.id}"
             if not missing_info:
-                return fr"<b>Creating booking successed</b>, just need to confirm the pay.<br/><br/><a href='{payment_url}'>Payment page</a>"
+                return fr"<b>Creating booking successed</b>, just need to confirm the pay.\n\n<a href='{payment_url}'>Payment page</a>"
                 # return fr"*Creating booking successed*, just need to confirm the pay\.\n\n[Payment page]({payment_url})"
             else:
                 readable_missing = \
                     f"{", ".join(missing_info[:-1])}, and {missing_info[-1]}" 
-                return fr"<b>Creating booking successed</b>, you have to enter {readable_missing} in payment page before confirming the pay.<br/><br/><a href='{payment_url}'>Payment Page</a>"
+                return fr"<b>Creating booking successed</b>, you have to enter {readable_missing} in payment page before confirming the pay.\n\n<a href='{payment_url}'>Payment Page</a>"
                 # return fr"*Creating booking successed*, you have to enter {readable_missing} in payment page before confirming the pay\`.\n\n[Payment Page]({payment_url})"
         print(f"Takes {time.time() - s_time:.1f}s")
 

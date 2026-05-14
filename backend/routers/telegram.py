@@ -22,7 +22,7 @@ ptb = Application.builder().token(TELEGRAM_TOKEN).build()
 
 
 def send_bill_to_telegram(chat_id, pdf_buffer, filename="invoice.pdf"):
-    token = os.getenv("TELEGRAM_TOKEN")
+    token = TELEGRAM_TOKEN
     url = f"https://api.telegram.org/bot{token}/sendDocument"
     
     files = {
