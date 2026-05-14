@@ -268,14 +268,6 @@ export default function LandingPage() {
                     About Us
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/privacy-policy"
-                    className="hover:text-[#d4af37] transition-colors"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
               </ul>
             </div>
 

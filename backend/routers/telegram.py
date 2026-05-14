@@ -1,3 +1,4 @@
+import pickle
 from services.conversation import load_conversation, save_conversation
 from langchain_core.messages import HumanMessage
 from fastapi import APIRouter, Request, Response
@@ -53,6 +54,7 @@ def send_photo_to_telegram(chat_id, photo_buffer, filename="image.png"):
     response = requests.post(url, data=data, files=files)
     return response.json()
 
+CONV_PATH = "./.data/conv_7.pkl"
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
     agent_app = get_agent()
 
@@ -66,6 +68,8 @@ async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "messages": conv + [HumanMessage(content=text)],
         "telegram_chatid": str(chat_id)
     })
+    with open(CONV_PATH, "wb") as file:
+        pickle.dump(res, file)
     ai_response = res["messages"][-1].content
 
     new_messages = [

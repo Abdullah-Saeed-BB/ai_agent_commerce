@@ -280,7 +280,8 @@ class AIAgent:
                 # return fr"*Creating booking successed*, just need to confirm the pay\.\n\n[Payment page]({payment_url})"
             else:
                 readable_missing = \
-                    f"{", ".join(missing_info[:-1])}, and {missing_info[-1]}" 
+                    f"{", ".join(missing_info[:-1])}, and {missing_info[-1]}" \
+                    if len(missing_info) > 1 else missing_info[0]
                 return f"<b>Creating booking successed</b>, you have to enter {readable_missing} in payment page before confirming the pay.\n\n<a href='{payment_url}'>Payment Page</a>"
                 # return fr"*Creating booking successed*, you have to enter {readable_missing} in payment page before confirming the pay\`.\n\n[Payment Page]({payment_url})"
         print(f"Takes {time.time() - s_time:.1f}s")

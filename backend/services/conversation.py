@@ -2,7 +2,6 @@ from typing import TypedDict
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from db.session import AsyncSessionLocal
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import Conversation
 
 async def load_conversation(chat_id: str):
