@@ -37,6 +37,7 @@ class AIAgent:
         import pandas as pd
         import chromadb
         import os
+        import requests
         print(f"Takes {time.time() - s_time:.1f}s")
 
 
@@ -45,6 +46,7 @@ class AIAgent:
         from db.session import AsyncSessionLocal
         from db.models import Booking, Barber
         from services.booking_service import get_availability, create_booking
+        from services.generate_schedule import generate_schedule_image
         print(f"Takes {time.time() - s_time:.1f}s")
 
         from dotenv import load_dotenv
@@ -124,6 +126,7 @@ class AIAgent:
 
         @tool
         async def find_free_times_tool(
+            state: Annotated[dict, InjectedState],
             start: str,
             end: str,
             limit: Optional[int] = None
@@ -146,33 +149,21 @@ class AIAgent:
             if not availability_data:
                 return "No barbers are available for the selected dates."
 
-            # Format Output
-            title = f"Here is {'the first ' + str(limit) if limit else ''} free times {'at *' + start + '*' if start == end else 'from *' + start + '* to *' + end + '*'}:"
-            final_output = [title]
-            
-            count = 0
-            for day_data in availability_data:
-                date_str = day_data["date"]
-                day_header = f"*Free times {date_str}:*"
-                time_strings = []
-                for slot in day_data["available_slots"]:
-                    names_fmt = ", ".join([f"'{b['name']}'" for b in slot['available_barbers']])
-                    
-                    # Format time to 12h
-                    t_obj = datetime.datetime.strptime(slot['time'], "%H:%M").time()
-                    t_str = t_obj.strftime("%I:%M %p").lstrip("0") if t_obj.strftime("%I")[0] == '0' else t_obj.strftime("%I:%M %p")
-                    
-                    time_strings.append(f"{t_str} ({names_fmt})")
-                    
-                    count += 1
-                    if limit and count >= limit:
-                        break
-                
-                final_output.append(f"{day_header} {', '.join(time_strings)}")
-                if limit and count >= limit:
-                    break
+            # Generate and send image
+            chat_id = state.get("telegram_chatid")
+            if chat_id:
+                try:
+                    from routers.telegram import send_photo_to_telegram
+                    img_buffer = generate_schedule_image(availability_data)
+                    caption = f"These are free times {'at ' + start if start == end else 'from ' + start + ' to ' + end} 📅"
+                    send_photo_to_telegram(chat_id, img_buffer, filename="schedule.png")
+                except Exception as e:
+                    print(f"Failed to generate or send schedule image: {e}")
 
-            return "\n".join(final_output)
+            # Format Output
+            title = f"These are free times {'at ' + start if start == end else 'from ' + start + ' to ' + end} 📅"
+
+            return title
 
 
         def validate_booking_time(dt_str: str) -> tuple[bool, datetime.datetime | str]:

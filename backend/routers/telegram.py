@@ -17,6 +17,7 @@ load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_WEBHOOK_URL = os.getenv("TELEGRAM_WEBHOOK_URL")
+print("telegram webhook:", TELEGRAM_WEBHOOK_URL)
 
 ptb = Application.builder().token(TELEGRAM_TOKEN).build() 
 
@@ -31,6 +32,20 @@ def send_bill_to_telegram(chat_id, pdf_buffer, filename="invoice.pdf"):
     data = {
         'chat_id': chat_id,
         'caption': "Here is your booking receipt from Silver Blade! ✂️"
+    }
+    
+    response = requests.post(url, data=data, files=files)
+    return response.json()
+
+def send_photo_to_telegram(chat_id, photo_buffer, filename="image.png"):
+    token = TELEGRAM_TOKEN
+    url = f"https://api.telegram.org/bot{token}/sendPhoto"
+    
+    files = {
+        'photo': (filename, photo_buffer, 'image/png')
+    }
+    data = {
+        'chat_id': chat_id,
     }
     
     response = requests.post(url, data=data, files=files)
