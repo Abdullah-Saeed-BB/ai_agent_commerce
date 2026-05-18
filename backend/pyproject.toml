@@ -30,4 +30,5 @@ dependencies = [
     "langchain-huggingface>=1.2.2",
     "python-telegram-bot>=22.7",
     "matplotlib>=3.10.9",
+    "pyjwt>=2.12.1",
 ]
