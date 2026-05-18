@@ -8,7 +8,8 @@
 
 - Address: 123 Heritage Way, Downtown District, City Center
 - Instagram Handle: @SilverBladeBarber
-- Booking Method: Instagram DM (Automated AI Assistant)
+- Telegram Handle: @CommercAgentBot
+- Booking Method: Telegram bot (Automated AI Assistant)
 
 ## Operating Hours
 
