@@ -56,13 +56,14 @@ app.add_middleware(
 )
 
 
-from routers import booking, stripe, test, telegram, auth
+from routers import booking, stripe, test, telegram, auth, dashboard
 
 app.include_router(test.router, prefix="/test", tags=["test"])
 app.include_router(booking.router, prefix="/booking", tags=["booking"])
 app.include_router(stripe.router, prefix="/webhook", tags=["stripe"])
 app.include_router(telegram.router, prefix="/webhook", tags=["telegram"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
