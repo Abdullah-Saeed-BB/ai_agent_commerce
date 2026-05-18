@@ -55,8 +55,17 @@ async def init_db():
 
         for barber in barbers_records:
             await conn.execute(
-                text("INSERT INTO barbers (id, name, career_start_date) VALUES (:id, :name, :career_start_date)"),
-                {"id": barber["id"], "name": barber["name"], "career_start_date": barber["career_start_date"]}
+                text(
+                    "INSERT INTO barbers (id, name, email, password, career_start_date) "
+                    "VALUES (:id, :name, :email, :password, :career_start_date)"
+                ),
+                {
+                    "id": barber["id"], 
+                    "name": barber["name"], 
+                    "email": barber["email"], 
+                    "password": str(barber["password"]), 
+                    "career_start_date": barber["career_start_date"]
+                }
             )
 
         services = pd.read_csv("./data/services.csv")
@@ -69,8 +78,15 @@ async def init_db():
 
         for service in services_records:
             await conn.execute(
-                text("INSERT INTO services (id, name, description, price) VALUES (:id, :name, :description, :price)"),
-                {"id": service["id"], "name": service["title"], "description": service["description"], "price": service["price"]}
+                text(
+                    "INSERT INTO services (id, name, description, price) "
+                    "VALUES (:id, :name, :description, :price)"
+                ),
+                {
+                    "id": service["id"], 
+                    "name": service["title"], 
+                    "description": service["description"], 
+                    "price": service["price"]}
             )
         
         await conn.commit()

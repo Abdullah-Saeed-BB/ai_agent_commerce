@@ -48,6 +48,8 @@ class Barber(Base):
         server_default=func.gen_random_uuid()
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[str] = mapped_column(String(100), nullable=False)
+    password: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     career_start_date: Mapped[date] = mapped_column(Date, nullable=False)
 
