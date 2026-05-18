@@ -11,7 +11,7 @@ from db.models import Barber
 
 router = APIRouter()
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "silver-blade-super-secret-key-change-in-production")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 8
 
