@@ -11,6 +11,17 @@ interface AvailableSlot {
   available_barbers: { id: string; name: string }[];
 }
 
+function toTitleCase(str: string) {
+  return str
+    .toLowerCase()
+    .replaceAll("_", " ")
+    .split(" ")
+    .map((word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+}
+
 export const BookingForm: React.FC<BookingFormProps> = ({
   booking,
   onSuccess,
@@ -131,26 +142,26 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
+      className="bg-[#141414] p-8 rounded-sm shadow-sm border border-white/5"
     >
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+      <h2 className="text-xl font-bold uppercase italic tracking-tight mb-6 text-white border-b border-white/10 pb-4">
         Complete Booking Details
       </h2>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded text-sm">
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-sm text-sm font-medium">
           {error}
         </div>
       )}
 
-      <div className="space-y-4 text-gray-600">
+      <div className="space-y-5 text-gray-300">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
             Customer Name
           </label>
           <input
             type="text"
-            className="w-full border border-gray-300 rounded-md p-2"
+            className="w-full border border-white/10 bg-black/50 text-white rounded-sm p-3 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] outline-none transition-all"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
             required
@@ -158,37 +169,41 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
             Service
           </label>
           <select
-            className="w-full border border-gray-300 rounded-md p-2 bg-white"
+            className="w-full border border-white/10 bg-black/50 text-white rounded-sm p-3 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] outline-none transition-all appearance-none"
             value={service}
             onChange={(e) => setService(e.target.value)}
             required
           >
-            <option value="">Select a service</option>
+            <option value="" className="bg-[#141414]">
+              Select a service
+            </option>
             {services.map((s) => (
-              <option key={s.id} value={s.name}>
-                {s.name} (${s.price})
+              <option key={s.id} value={s.name} className="bg-[#141414]">
+                {toTitleCase(s.name)} (${s.price})
               </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
             Barber
           </label>
           <select
-            className="w-full border border-gray-300 rounded-md p-2 bg-white"
+            className="w-full border border-white/10 bg-black/50 text-white rounded-sm p-3 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] outline-none transition-all appearance-none"
             value={barber}
             onChange={(e) => setBarber(e.target.value)}
             required
           >
-            <option value="">Select a barber</option>
+            <option value="" className="bg-[#141414]">
+              Select a barber
+            </option>
             {barbers.map((b) => (
-              <option key={b.id} value={b.name}>
+              <option key={b.id} value={b.name} className="bg-[#141414]">
                 {b.name}
               </option>
             ))}
@@ -197,36 +212,45 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
               Date
             </label>
             <input
               type="date"
-              className="w-full border border-gray-300 rounded-md p-2"
+              className="w-full border border-white/10 bg-black/50 text-white rounded-sm p-3 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] outline-none transition-all"
               value={bookingDate}
               onChange={(e) => setBookingDate(e.target.value)}
               min={new Date().toISOString().split("T")[0]}
               required
+              style={{ colorScheme: "dark" }}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
               Time
             </label>
             <select
-              className="w-full border border-gray-300 rounded-md p-2 bg-white"
+              className="w-full border border-white/10 bg-black/50 text-white rounded-sm p-3 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] outline-none transition-all appearance-none disabled:opacity-50"
               value={bookingTime}
               onChange={(e) => setBookingTime(e.target.value)}
               required
               disabled={!bookingDate}
             >
-              <option value="">Select a time</option>
+              <option value="" className="bg-[#141414]">
+                Select a time
+              </option>
               {bookingTime &&
                 !availableSlots.some((slot) => slot.time === bookingTime) && (
-                  <option value={bookingTime}>{bookingTime}</option>
+                  <option value={bookingTime} className="bg-[#141414]">
+                    {bookingTime}
+                  </option>
                 )}
               {availableSlots.map((slot) => (
-                <option key={slot.time} value={slot.time}>
+                <option
+                  key={slot.time}
+                  value={slot.time}
+                  className="bg-[#141414]"
+                >
                   {slot.time} |{" "}
                   {slot.available_barbers.map((b) => b.name).join(", ")}
                 </option>
@@ -238,9 +262,9 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
+          className="w-full bg-[#d4af37] text-black font-bold uppercase tracking-widest py-4 px-6 mt-4 rounded-sm hover:bg-[#b8962d] transition-all disabled:opacity-50"
         >
-          {loading ? "Saving..." : "Confirm Details & Pay"}
+          {loading ? "Saving..." : "Confirm Details"}
         </button>
       </div>
     </form>

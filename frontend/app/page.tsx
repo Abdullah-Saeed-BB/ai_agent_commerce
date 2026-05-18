@@ -26,7 +26,7 @@ export default function LandingPage() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3">
               <Image
-                src="/logo.png"
+                src="/brand_logo_transparent.png"
                 alt="Silver Blade Logo"
                 width={40}
                 height={40}
@@ -162,7 +162,7 @@ export default function LandingPage() {
               <div className="aspect-[4/5] bg-neutral-900 border border-white/5 rounded-sm overflow-hidden relative group">
                 <div className="absolute inset-0 flex items-center justify-center opacity-10">
                   <Image
-                    src="/logo.png"
+                    src="/brand_logo.png"
                     alt="Silver Blade Logo Large"
                     width={400}
                     height={400}
@@ -226,7 +226,7 @@ export default function LandingPage() {
             <div className="col-span-1 md:col-span-1 lg:col-span-1">
               <div className="flex items-center gap-3 mb-6">
                 <Image
-                  src="/logo.png"
+                  src="/brand_logo_transparent.png"
                   alt="Silver Blade Logo"
                   width={32}
                   height={32}
@@ -243,6 +243,10 @@ export default function LandingPage() {
                 <SocialIcon
                   icon={<InstagramIcon />}
                   href="https://www.instagram.com/silverblade_1/"
+                />
+                <SocialIcon
+                  icon={<TelegramIcon />}
+                  href="https://t.me/CommercAgentBot"
                 />
               </div>
             </div>
@@ -375,7 +379,7 @@ const InstagramIcon = () => (
   </svg>
 );
 
-const FacebookIcon = () => (
+const TelegramIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="20"
@@ -387,22 +391,7 @@ const FacebookIcon = () => (
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-  </svg>
-);
-
-const TwitterIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+    <path d="M22 2L11 13" />
+    <path d="M22 2l-7 20-4-9-9-4 20-7z" />
   </svg>
 );
