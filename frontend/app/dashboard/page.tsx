@@ -3,8 +3,25 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { LogOut, Star, Calendar, TrendingUp, Users, Clock, Briefcase, Scissors } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LogOut,
+  Star,
+  Calendar,
+  TrendingUp,
+  Users,
+  Clock,
+  Briefcase,
+  Scissors,
+} from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 type DashboardStats = {
   business: {
@@ -45,11 +62,14 @@ export default function DashboardPage() {
 
   async function fetchStats(token: string) {
     try {
-      const res = await fetch("http://localhost:8000/dashboard/stats", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/dashboard/stats`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
       if (!res.ok) {
         if (res.status === 401) {
           handleLogout();
@@ -57,16 +77,23 @@ export default function DashboardPage() {
         return;
       }
       const data = await res.json();
-      
+
       // format dates for the chart
       if (data.business && data.business.bookings_per_day) {
-        data.business.bookings_per_day = data.business.bookings_per_day.map((d: any) => {
-          const dateObj = new Date(d.date);
-          return {
-            ...d,
-            dayName: dateObj.toLocaleDateString("en-US", { weekday: 'short' })
-          };
-        });
+        data.business.bookings_per_day = data.business.bookings_per_day.map(
+          (d: any) => {
+            // Parse YYYY-MM-DD in UTC to avoid local timezone shifting
+            const [year, month, day] = d.date.split("-").map(Number);
+            const dateObj = new Date(Date.UTC(year, month - 1, day));
+            return {
+              ...d,
+              dayName: dateObj.toLocaleDateString("en-US", {
+                weekday: "short",
+                timeZone: "UTC",
+              }),
+            };
+          },
+        );
       }
 
       setStats(data);
@@ -119,7 +146,11 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               {barberName && (
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                  <Star size={12} className="text-[#d4af37]" fill="currentColor" />
+                  <Star
+                    size={12}
+                    className="text-[#d4af37]"
+                    fill="currentColor"
+                  />
                   <span className="text-xs font-bold uppercase tracking-widest text-gray-300">
                     {barberName}
                   </span>
@@ -144,35 +175,43 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-black tracking-tighter uppercase italic mb-2">
             Welcome back, <span className="text-[#d4af37]">{barberName}</span>
           </h1>
-          <p className="text-gray-500 text-sm">Here is what's happening with your business today.</p>
+          <p className="text-gray-500 text-sm">
+            Here is what's happening with your business today.
+          </p>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-20">
-             <span className="w-8 h-8 border-2 border-[#d4af37]/30 border-t-[#d4af37] rounded-full animate-spin" />
+            <span className="w-8 h-8 border-2 border-[#d4af37]/30 border-t-[#d4af37] rounded-full animate-spin" />
           </div>
         ) : stats ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
             {/* LEFT COLUMN: BARBER INFO */}
             <div className="lg:col-span-1 space-y-6">
-              
               {/* Barber Stats Cards */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/5 border border-white/10 p-5 rounded-sm relative overflow-hidden group hover:border-[#d4af37]/30 transition-all">
                   <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <Calendar size={48} />
                   </div>
-                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">This Month</p>
-                  <h3 className="text-3xl font-black text-white">{stats.barber.appointments_this_month}</h3>
+                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+                    This Month
+                  </p>
+                  <h3 className="text-3xl font-black text-white">
+                    {stats.barber.appointments_this_month}
+                  </h3>
                 </div>
-                
+
                 <div className="bg-white/5 border border-white/10 p-5 rounded-sm relative overflow-hidden group hover:border-[#d4af37]/30 transition-all">
                   <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <Briefcase size={48} />
                   </div>
-                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Total</p>
-                  <h3 className="text-3xl font-black text-[#d4af37]">{stats.barber.total_appointments}</h3>
+                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">
+                    Total
+                  </p>
+                  <h3 className="text-3xl font-black text-[#d4af37]">
+                    {stats.barber.total_appointments}
+                  </h3>
                 </div>
               </div>
 
@@ -180,23 +219,37 @@ export default function DashboardPage() {
               <div className="bg-white/5 border border-white/10 rounded-sm p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <Clock size={18} className="text-[#d4af37]" />
-                  <h2 className="text-sm font-bold uppercase tracking-widest">Next Appointments</h2>
+                  <h2 className="text-sm font-bold uppercase tracking-widest">
+                    Next Appointments
+                  </h2>
                 </div>
-                
+
                 {stats.barber.next_appointments.length > 0 ? (
                   <div className="space-y-4">
                     {stats.barber.next_appointments.map((appt) => (
-                      <div key={appt.id} className="flex items-start justify-between border-b border-white/5 pb-4 last:border-0 last:pb-0">
+                      <div
+                        key={appt.id}
+                        className="flex items-start justify-between border-b border-white/5 pb-4 last:border-0 last:pb-0"
+                      >
                         <div>
-                          <p className="text-white font-medium">{appt.customer_name}</p>
-                          <p className="text-gray-500 text-xs mt-1">{appt.service}</p>
+                          <p className="text-white font-medium">
+                            {appt.customer_name}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-1">
+                            {appt.service}
+                          </p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-bold text-[#d4af37]">
-                            {new Date(appt.booking_datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(appt.booking_datetime).toLocaleTimeString(
+                              [],
+                              { hour: "2-digit", minute: "2-digit" },
+                            )}
                           </p>
                           <p className="text-gray-500 text-xs mt-1">
-                            {new Date(appt.booking_datetime).toLocaleDateString()}
+                            {new Date(
+                              appt.booking_datetime,
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
@@ -212,41 +265,53 @@ export default function DashboardPage() {
 
             {/* RIGHT COLUMN: BUSINESS INFO */}
             <div className="lg:col-span-2 space-y-6">
-              
               {/* Chart */}
               <div className="bg-white/5 border border-white/10 rounded-sm p-6 h-96 flex flex-col">
                 <div className="flex items-center gap-2 mb-6">
                   <TrendingUp size={18} className="text-[#d4af37]" />
-                  <h2 className="text-sm font-bold uppercase tracking-widest">Weekly Bookings</h2>
+                  <h2 className="text-sm font-bold uppercase tracking-widest">
+                    Weekly Bookings
+                  </h2>
                 </div>
-                
+
                 <div className="flex-1 w-full h-full min-h-0">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stats.business.bookings_per_day} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                      <XAxis 
-                        dataKey="dayName" 
-                        stroke="#ffffff50" 
-                        fontSize={12} 
+                    <BarChart
+                      data={stats.business.bookings_per_day}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#ffffff10"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="dayName"
+                        stroke="#ffffff50"
+                        fontSize={12}
                         tickLine={false}
                         axisLine={false}
                       />
-                      <YAxis 
-                        stroke="#ffffff50" 
-                        fontSize={12} 
+                      <YAxis
+                        stroke="#ffffff50"
+                        fontSize={12}
                         tickLine={false}
                         axisLine={false}
                         allowDecimals={false}
                       />
-                      <Tooltip 
-                        cursor={{ fill: '#ffffff05' }}
-                        contentStyle={{ backgroundColor: '#0a0a0a', borderColor: '#ffffff20', borderRadius: '4px' }}
-                        itemStyle={{ color: '#d4af37' }}
+                      <Tooltip
+                        cursor={{ fill: "#ffffff05" }}
+                        contentStyle={{
+                          backgroundColor: "#0a0a0a",
+                          borderColor: "#ffffff20",
+                          borderRadius: "4px",
+                        }}
+                        itemStyle={{ color: "#d4af37" }}
                       />
-                      <Bar 
-                        dataKey="count" 
-                        fill="#d4af37" 
-                        radius={[4, 4, 0, 0]} 
+                      <Bar
+                        dataKey="count"
+                        fill="#d4af37"
+                        radius={[4, 4, 0, 0]}
                         barSize={40}
                       />
                     </BarChart>
@@ -258,16 +323,25 @@ export default function DashboardPage() {
               <div className="bg-white/5 border border-white/10 rounded-sm p-6">
                 <div className="flex items-center gap-2 mb-6">
                   <Scissors size={18} className="text-[#d4af37]" />
-                  <h2 className="text-sm font-bold uppercase tracking-widest">Top Services This Month</h2>
+                  <h2 className="text-sm font-bold uppercase tracking-widest">
+                    Top Services This Month
+                  </h2>
                 </div>
-                
+
                 {stats.business.top_services.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {stats.business.top_services.map((service, idx) => (
-                      <div key={idx} className="bg-[#0a0a0a] border border-white/5 p-4 rounded-sm flex items-center justify-between">
+                      <div
+                        key={idx}
+                        className="bg-[#0a0a0a] border border-white/5 p-4 rounded-sm flex items-center justify-between"
+                      >
                         <div className="flex items-center gap-3">
-                          <span className="text-[#d4af37] text-xs font-black">#{idx + 1}</span>
-                          <p className="text-sm text-gray-300 font-medium">{service.name}</p>
+                          <span className="text-[#d4af37] text-xs font-black">
+                            #{idx + 1}
+                          </span>
+                          <p className="text-sm text-gray-300 font-medium">
+                            {service.name}
+                          </p>
                         </div>
                         <span className="text-xs font-bold text-gray-500 bg-white/5 px-2 py-1 rounded-sm">
                           {service.count}
@@ -281,7 +355,6 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
-
             </div>
           </div>
         ) : (

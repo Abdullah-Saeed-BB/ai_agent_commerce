@@ -20,12 +20,12 @@ export default function BarberLoginPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/auth/login`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -100,7 +100,11 @@ export default function BarberLoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5" id="barber-login-form">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+            id="barber-login-form"
+          >
             {/* Email */}
             <div className="space-y-2">
               <label

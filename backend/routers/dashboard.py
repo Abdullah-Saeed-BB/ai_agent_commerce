@@ -27,16 +27,19 @@ async def get_current_barber(credentials: HTTPAuthorizationCredentials = Depends
 @router.get("/stats")
 async def get_dashboard_stats(barber_id: str = Depends(get_current_barber), db: AsyncSession = Depends(get_db)):
     now = datetime.now()
-    seven_days_ago = now - timedelta(days=7)
+    today = now.date()
+    start_of_week = today - timedelta(days=today.weekday())  # Monday
+    end_of_week = start_of_week + timedelta(days=6)          # Sunday
     this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-    # 1. Business: Bookings per day (last 7 days)
+    # 1. Business: Bookings per day (current week: Monday to Sunday)
     bookings_per_day_query = (
         select(
             cast(Booking.booking_datetime, Date).label("date"),
             func.count(Booking.id).label("count")
         )
-        .where(Booking.booking_datetime >= seven_days_ago)
+        .where(cast(Booking.booking_datetime, Date) >= start_of_week)
+        .where(cast(Booking.booking_datetime, Date) <= end_of_week)
         .group_by(cast(Booking.booking_datetime, Date))
         .order_by(cast(Booking.booking_datetime, Date))
     )
@@ -45,12 +48,13 @@ async def get_dashboard_stats(barber_id: str = Depends(get_current_barber), db: 
         {"date": row.date.strftime("%Y-%m-%d"), "count": row.count} 
         for row in result_bpd.all()
     ]
+    print(bookings_per_day)
 
-    # Fill missing days with 0
+    # Fill missing days of the current week with 0
     date_counts = {item["date"]: item["count"] for item in bookings_per_day}
     filled_bookings_per_day = []
     for i in range(7):
-        day = (seven_days_ago + timedelta(days=i)).strftime("%Y-%m-%d")
+        day = (start_of_week + timedelta(days=i)).strftime("%Y-%m-%d")
         filled_bookings_per_day.append({"date": day, "count": date_counts.get(day, 0)})
 
     # 2. Business: Top 3 services this month

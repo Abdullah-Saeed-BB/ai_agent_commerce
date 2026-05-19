@@ -13,7 +13,7 @@
 
 ## Operating Hours
 
-- Monday - Saturday: 09:00 AM - 08:00 PM
+- Monday - Saturday: 09:00 AM - 06:00 PM
 - Sunday: Closed
 
 ## Booking Policies & FAQ
