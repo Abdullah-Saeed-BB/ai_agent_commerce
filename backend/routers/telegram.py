@@ -1,3 +1,4 @@
+from telegram.ext import CommandHandler
 import pickle
 from services.conversation import load_conversation, save_conversation
 from langchain_core.messages import HumanMessage
@@ -21,6 +22,14 @@ TELEGRAM_WEBHOOK_URL = os.getenv("TELEGRAM_WEBHOOK_URL")
 print("telegram webhook:", TELEGRAM_WEBHOOK_URL)
 
 ptb = Application.builder().token(TELEGRAM_TOKEN).build() 
+
+# Start command
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    with open("./data/start_message.md", "r", encoding="utf-8") as file:
+        start_msg = file.read()
+    await update.message.reply_text(start_msg, parse_mode="HTML")
+
+ptb.add_handler(CommandHandler("start", start))
 
 def clean_br_tag(text: str):
     return text.replace("<br/>", "\n").replace("<br>", "\n").replace("</br>", "\n")
