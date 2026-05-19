@@ -84,14 +84,12 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up [animation-delay:400ms]">
               <Link
-                href="/payment"
-                className="group w-full sm:w-auto px-10 py-4 bg-[#d4af37] text-black text-lg font-bold uppercase tracking-widest hover:bg-[#b8962d] transition-all rounded-sm flex items-center justify-center gap-2"
+                target="_blank"
+                href="https://t.me/CommercAgentBot"
+                className="group w-full sm:w-auto px-10 py-4 bg-[#d4af37] text-black text-md md:text-lg font-bold uppercase tracking-widest hover:bg-[#b8962d] transition-all rounded-sm flex items-center justify-center gap-2"
               >
-                Book Appointment
-                <ChevronRight
-                  size={20}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
+                Book Appointment via Telegram
+                <TelegramIcon />
               </Link>
               <Link
                 href="#services"
