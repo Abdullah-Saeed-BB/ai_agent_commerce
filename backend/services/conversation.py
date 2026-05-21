@@ -18,7 +18,7 @@ async def load_conversation(chat_id: str):
         try:
             stmt = select(Conversation).\
                     where(Conversation.chatid == str(chat_id)).\
-                    order_by(Conversation.created_at.desc()).\
+                    order_by(Conversation.created_at).\
                     limit(7)
             result = await session.execute(stmt)
             history = result.scalars().all()
