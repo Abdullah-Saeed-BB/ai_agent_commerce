@@ -115,7 +115,7 @@ class AIAgent:
             docs = retriever.invoke(query)
 
             if not docs:
-                return "I found no relevant information in the Stock Market Performance 2024 document."
+                return "I found no relevant information."
 
             results = []
             for i, doc in enumerate(docs):
