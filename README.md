@@ -90,14 +90,11 @@ docker run -d -p 8000:8001 --name commerce-chroma chromadb/chroma
 
 ### 2. Backend Setup
 
-1. Navigate to the backend directory and configure your virtual environment:
+1. Navigate to the backend directory and install the dependencies:
 
 ```bash
    cd backend
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
-   pip install -r requirements.txt
-
+   uv sync
 ```
 
 2. Create a `.env` configuration file inside the `backend/` directory:
@@ -121,10 +118,10 @@ docker run -d -p 8000:8001 --name commerce-chroma chromadb/chroma
 
 ```bash
    # In terminal window 1 (Background workers)
-   arq worker.py:Worker
+   uv run arq worker.WorkerSettings
 
    # In terminal window 2 (Web server api)
-   uvicorn main:app --reload
+   uv run uvicorn main:app --reload
 
 ```
 
