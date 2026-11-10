@@ -8,8 +8,8 @@ import {
   MapPin,
   Phone,
   Star,
-  ChevronRight,
 } from "lucide-react";
+import Navbar from "./components/Navbar";
 
 export const metadata = {
   title: "Silver Blade Barbershop | Premium Grooming & Style",
@@ -21,44 +21,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#ededed] font-sans selection:bg-[#d4af37] selection:text-black scroll-smooth">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-[#0a0a0a]/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/brand_logo_transparent.png"
-                alt="Silver Blade Logo"
-                width={40}
-                height={40}
-                className="w-10 h-10 object-contain"
-              />
-              <span className="text-xl font-bold tracking-tighter uppercase italic">
-                Silver <span className="text-[#d4af37]">Blade</span>
-              </span>
-            </div>
-            <div className="hidden md:flex items-center gap-8">
-              <Link
-                href="#services"
-                className="text-sm font-medium hover:text-[#d4af37] transition-colors"
-              >
-                Services
-              </Link>
-              <Link
-                href="#about"
-                className="text-sm font-medium hover:text-[#d4af37] transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="#contact"
-                className="text-sm font-medium hover:text-[#d4af37] transition-colors"
-              >
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
@@ -84,17 +47,14 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up [animation-delay:400ms]">
               <Link
-                target="_blank"
-                href="https://t.me/CommercAgentBot"
-                className="group w-full sm:w-auto px-10 py-4 bg-[#d4af37] text-black text-md md:text-lg font-bold uppercase tracking-widest hover:bg-[#b8962d] transition-all rounded-sm flex items-center justify-center gap-2"
-              >
-                Book Appointment via Telegram
-                <TelegramIcon />
+                href="/chat"
+                className="group w-full sm:w-auto px-10 py-4 bg-[#d4af37] text-black text-md md:text-lg font-bold uppercase tracking-widest hover:bg-[#b8962d] transition-all rounded-sm flex items-center justify-center gap-2">
+                Try the AI Assistant
+                <Scissors size={20} />
               </Link>
               <Link
                 href="#services"
-                className="w-full sm:w-auto px-10 py-4 bg-white/5 text-white text-lg font-bold uppercase tracking-widest hover:bg-white/10 border border-white/10 transition-all rounded-sm"
-              >
+                className="w-full sm:w-auto px-10 py-4 bg-white/5 text-white text-lg font-bold uppercase tracking-widest hover:bg-white/10 border border-white/10 transition-all rounded-sm">
                 View Services
               </Link>
             </div>
@@ -257,16 +217,14 @@ export default function LandingPage() {
                 <li>
                   <Link
                     href="#services"
-                    className="hover:text-[#d4af37] transition-colors"
-                  >
+                    className="hover:text-[#d4af37] transition-colors">
                     Services
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="#about"
-                    className="hover:text-[#d4af37] transition-colors"
-                  >
+                    className="hover:text-[#d4af37] transition-colors">
                     About Us
                   </Link>
                 </li>
@@ -352,8 +310,7 @@ function SocialIcon({ icon, href }: { icon: React.ReactNode; href: string }) {
   return (
     <a
       href={href}
-      className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#d4af37] hover:border-[#d4af37] transition-all bg-white/5"
-    >
+      className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#d4af37] hover:border-[#d4af37] transition-all bg-white/5">
       {icon}
     </a>
   );
@@ -369,8 +326,7 @@ const InstagramIcon = () => (
     stroke="currentColor"
     strokeWidth="2"
     strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+    strokeLinejoin="round">
     <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
     <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
@@ -387,8 +343,7 @@ const TelegramIcon = () => (
     stroke="currentColor"
     strokeWidth="2"
     strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+    strokeLinejoin="round">
     <path d="M22 2L11 13" />
     <path d="M22 2l-7 20-4-9-9-4 20-7z" />
   </svg>

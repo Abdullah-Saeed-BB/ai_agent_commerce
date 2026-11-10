@@ -92,12 +92,13 @@ async def create_payment(
         await db.commit()
         await db.refresh(new_booking)
 
-        # ── Schedule auto-cancel after 30 minutes ─────────────────────────────
-        await arq_pool.enqueue_job(
-            "cancel_booking_task",
-            booking_id=str(new_booking.id),
-            _defer_by=30 * 60,
-        )
+        # ── Schedule auto-cancel after 30 minutes (only when ARQ is available)
+        if arq_pool:
+            await arq_pool.enqueue_job(
+                "cancel_booking_task",
+                booking_id=str(new_booking.id),
+                _defer_by=30 * 60,
+            )
 
         payment_link = f"{frontend_url}/payment?id={new_booking.id}"
         return {

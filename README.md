@@ -2,7 +2,7 @@
 
 AI Agent Commerce is an AI-powered conversational commerce and booking system designed to automate appointments, handle payments, and manage schedules seamlessly through messaging platforms.
 
-This system provides an AI-powered conversational agent via a Telegram Bot that interacts with customers in natural language to identify services, select preferred staff, check availability, handle secure Stripe transactions, and issue digital bills with barcodes.
+This system provides an AI-powered conversational agent via a web chat interface that interacts with customers in natural language to identify services, select preferred staff, check availability, and handle secure Stripe transactions.
 
 ## Tools
 
@@ -43,12 +43,11 @@ The backend follows a service-oriented architecture, cleanly separating the API 
 backend/
 ├── ai_agent.py          # [MAIN FILE] Core AI agent logic using LangChain/LangGraph
 ├── main.py              # FastAPI application entry point
-├── tele_bot.py          # Telegram Bot webhook integration
-├── routers/             # FastAPI route handlers (endpoints)
+├── routers/             # FastAPI route handlers (endpoints, incl. chat simulator)
 ├── services/            # Business logic layer (e.g., booking_service)
 ├── models/              # SQLAlchemy database models and Pydantic schemas
 ├── db/                  # Database connection and session management
-├── worker.py            # ARQ background task worker for async jobs
+├── worker.py            # (optional) ARQ background task worker for async jobs
 ├── data/ & chroma-data/ # Vector DB and embedding storage
 ├── bills/               # Generated bills and barcodes storage
 └── pyproject.toml       # Python dependencies and project configuration
@@ -80,10 +79,9 @@ Ensure you have **Docker** installed to manage external services, alongside a ru
 
 ### 1. Infrastructure (Docker Setup)
 
-Spin up the required background instances for the cache store (**Redis**) and vector index database (**ChromaVDB**):
+Spin up the vector index database (**ChromaVDB**). Redis is optional — it is only needed for the ARQ background auto-cancel worker.
 
 ```bash
-docker run -d -p 6379:6379 --name commerce-redis redis:alpine
 docker run -d -p 8000:8001 --name commerce-chroma chromadb/chroma
 
 ```
@@ -101,12 +99,10 @@ docker run -d -p 8000:8001 --name commerce-chroma chromadb/chroma
 
 ```env
    DATABASE_URL="postgresql://[username]:[password]@localhost:5432/ai_commerce"
-   REDIS_URL="redis://localhost:6379"
    CHROMA_SERVER_HOST="localhost"
    CHROMA_SERVER_HTTP_PORT="8000"
 
    GROQ_API_KEY="YOUR_GROQ_API_KEY"
-   TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"
    STRIPE_SECRET_KEY="YOUR_STRIPE_SECRET_KEY"
 
    JWT_SECRET_KEY="YOUR_JWT_SECRET_KEY"
@@ -114,16 +110,14 @@ docker run -d -p 8000:8001 --name commerce-chroma chromadb/chroma
 
 ```
 
-3. Launch the background async job worker and the FastAPI server application:
+3. Launch the FastAPI server application:
 
 ```bash
-   # In terminal window 1 (Background workers)
-   uv run arq worker.WorkerSettings
-
-   # In terminal window 2 (Web server api)
    uv run uvicorn main:app --reload
 
 ```
+
+> **Optional:** To enable the 30-minute auto-cancel of unpaid bookings, start Redis and an ARQ worker in a separate terminal with `uv run arq worker.WorkerSettings`.
 
 ### 3. Frontend Setup
 

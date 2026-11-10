@@ -1,7 +1,7 @@
 from typing import TypedDict
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from db.session import AsyncSessionLocal
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from db.models import Conversation
 
 async def load_conversation(chat_id: str):
@@ -54,4 +54,17 @@ async def save_conversation(chat_id: str, messages: list[Message]):
             print(f"Error while saving conversation. Error: {e}")
             return False
     
+    return True
+
+async def reset_conversation(chat_id: str):
+    """Delete a session's conversation history."""
+    async with AsyncSessionLocal() as session:
+        try:
+            stmt = delete(Conversation).where(Conversation.chatid == str(chat_id))
+            await session.execute(stmt)
+            await session.commit()
+        except Exception as e:
+            print(f"Error while resetting conversation. Error: {e}")
+            return False
+
     return True

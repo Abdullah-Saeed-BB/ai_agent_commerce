@@ -1,9 +1,8 @@
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from arq import create_pool
 from arq.connections import RedisSettings
 from contextlib import asynccontextmanager
-from routers.telegram import ptb, TELEGRAM_WEBHOOK_URL
 import uvicorn
 import stripe
 import os
@@ -15,35 +14,23 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    pool = await create_pool(RedisSettings())
+    # Redis/ARQ is optional. When it's missing, the app still boots and the
+    # auto-cancel background task is simply skipped (create_booking no-ops).
+    pool = None
+    try:
+        pool = await create_pool(RedisSettings())
+        await pool.ping()
+        print("Connected to Redis — ARQ auto-cancel enabled.")
+    except Exception as e:
+        print(f"Redis/ARQ unavailable ({e}) — running without background auto-cancel.")
+        pool = None
+
     app.state.arq_pool = pool
 
-    # Check if Redis is available
-    try:
-        await pool.ping()
-        redis_ok = True
-    except Exception:
-        redis_ok = False
+    yield
 
-    if not redis_ok:
-        raise RuntimeError("Redis is not working")
-
-    # Check if ARQ workers are available
-    worker_keys = await pool.keys("arq:queue:*")
-    if not worker_keys:
-        raise RuntimeError("No ARQ workers detected")
-
-    # Set webhook for Telegram bot
-    await ptb.bot.set_webhook(
-        url=TELEGRAM_WEBHOOK_URL,
-        allowed_updates=["message", "callback_query"]
-    )
-    async with ptb:
-        await ptb.start()
-        yield
-        await ptb.stop()    
-
-    await pool.close()
+    if pool:
+        await pool.close()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -56,12 +43,12 @@ app.add_middleware(
 )
 
 
-from routers import booking, stripe, test, telegram, auth, dashboard
+from routers import booking, stripe, test, chat, auth, dashboard
 
 app.include_router(test.router, prefix="/test", tags=["test"])
 app.include_router(booking.router, prefix="/booking", tags=["booking"])
 app.include_router(stripe.router, prefix="/webhook", tags=["stripe"])
-app.include_router(telegram.router, prefix="/webhook", tags=["telegram"])
+app.include_router(chat.router, prefix="/chat", tags=["chat"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 

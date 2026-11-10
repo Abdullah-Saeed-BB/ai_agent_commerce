@@ -149,20 +149,19 @@ class AIAgent:
             if not availability_data:
                 return "No barbers are available for the selected dates."
 
-            # Generate and send image
-            chat_id = state.get("telegram_chatid")
-            if chat_id:
-                try:
-                    from routers.telegram import send_photo_to_telegram
-                    img_buffer = generate_schedule_image(availability_data)
-                    send_photo_to_telegram(chat_id, img_buffer, filename="schedule.png")
-                except Exception as e:
-                    print(f"Failed to generate or send schedule image: {e}")
-
-            # Format Output
+            # Format Output (plain text for the web chat; the Telegram photo
+            # flow has been removed along with the Telegram integration)
             title = f"These are free times {'at ' + start if start == end else 'from ' + start + ' to ' + end} 📅"
 
-            return title
+            lines = [title]
+            for entry in availability_data:
+                day = entry["date"]
+                lines.append(f"\n<b>{day}</b>")
+                for slot in entry["available_slots"]:
+                    barbers = ", ".join(b["name"] for b in slot["available_barbers"])
+                    lines.append(f"  • {slot['time']} — {barbers}")
+
+            return "\n".join(lines)
 
 
         def validate_booking_time(dt_str: str) -> tuple[bool, datetime.datetime | str]:
