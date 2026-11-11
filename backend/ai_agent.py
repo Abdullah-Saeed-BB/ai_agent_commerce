@@ -23,7 +23,7 @@ class AIAgent:
         from langchain_core.tools import tool
         from langchain.chat_models import init_chat_model
         from langchain_chroma import Chroma
-        from langchain_huggingface import HuggingFaceEmbeddings
+        from langchain_openai import OpenAIEmbeddings
         print(f"Takes {time.time() - s_time:.1f}s")
 
 
@@ -60,18 +60,23 @@ class AIAgent:
         BASE_DIR = Path(__file__).parent
 
         PERSIST_DIRECTORY = BASE_DIR / ".data" / "silver_blade_vdb"
-        MODEL_PATH = BASE_DIR / "models" / "embedding_function"
 
         VDB_HOST = os.getenv("VDB_HOST")
         VDB_PORT = os.getenv("VDB_PORT")
 
         client = chromadb.HttpClient(host=VDB_HOST, port=VDB_PORT)
 
-        # print("Loading embedding function locally ...")
+        OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+        openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
+        embed_model = os.getenv("EMBEDDING_MODEL")
 
-        embedding_function = HuggingFaceEmbeddings(
-            model=str(MODEL_PATH),
-            
+        embedding_function = OpenAIEmbeddings(
+            model=embed_model,
+            api_key=openrouter_api_key,
+            base_url=OPENROUTER_BASE_URL,
+            # OpenRouter's /embeddings only accepts plain strings,
+            # not the pre-tokenized token-ID arrays langchain sends by default
+            check_embedding_ctx_length=False,
         )
 
         # print("Creating Vector Store ...")
@@ -287,11 +292,15 @@ class AIAgent:
 
         s_time = time.time()
         print("Start loading LLM ... ", end="")
-        # Initilization the AI Agent
+        # Initilization the AI Agent via OpenRouter (OpenAI-compatible API)
+        llm_model = os.getenv("LLM_MODEL")
+
         llm = init_chat_model(
-            model="openai/gpt-oss-120b",
-            model_provider="groq",
-            temperature=0
+            model=llm_model,
+            model_provider="openai",
+            temperature=0,
+            api_key=openrouter_api_key,
+            base_url=OPENROUTER_BASE_URL,
         )
         print(f"Takes {time.time() - s_time:.1f}s")
 
