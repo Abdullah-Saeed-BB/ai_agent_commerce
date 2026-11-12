@@ -154,10 +154,26 @@ class AIAgent:
             if not availability_data:
                 return "No barbers are available for the selected dates."
 
-            # Format Output (plain text for the web chat; the Telegram photo
-            # flow has been removed along with the Telegram integration)
+            # Generate the schedule image for the current chat session (the
+            # web chat renders it in place of the old Telegram photo message)
+            chat_id = state.get("telegram_chatid")
+            has_image = False
+            if chat_id:
+                try:
+                    from services.schedule_store import save_schedule_image
+                    img_buffer = generate_schedule_image(availability_data)
+                    save_schedule_image(chat_id, img_buffer)
+                    has_image = True
+                except Exception as e:
+                    print(f"Failed to generate schedule image: {e}")
+
+            # Format Output
             title = f"These are free times {'at ' + start if start == end else 'from ' + start + ' to ' + end} 📅"
 
+            if has_image:
+                return title
+
+            # Fallback: list the slots as text when the image is unavailable
             lines = [title]
             for entry in availability_data:
                 day = entry["date"]

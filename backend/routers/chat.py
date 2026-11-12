@@ -1,16 +1,28 @@
 import uuid
 from pydantic import BaseModel
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from langchain_core.messages import HumanMessage
 
 from ai_agent import get_agent
 from services.conversation import load_conversation, save_conversation, reset_conversation
+from services.schedule_store import take_session_images, get_schedule_image
 
 router = APIRouter()
 
 
 class ChatRequest(BaseModel):
     message: str
+
+
+@router.get("/schedule/{image_id}")
+async def get_schedule(image_id: str):
+    """Serve a schedule image generated during a chat session."""
+    # URLs end in .png for a nicer download filename; the stored key is the
+    # bare id, so strip the extension before looking up.
+    data = get_schedule_image(image_id.removesuffix(".png"))
+    if not data:
+        raise HTTPException(status_code=404, detail="Schedule image not found")
+    return Response(content=data, media_type="image/png")
 
 
 @router.post("/session")
@@ -33,7 +45,9 @@ async def send_message(session_id: str, body: ChatRequest):
 
     res = await agent_app.ainvoke({
         "messages": conv + [HumanMessage(content=text)],
-        "telegram_chatid": None,
+        # The session id doubles as the chat id; tools use it to attach
+        # generated artifacts (e.g. schedule images) to this session.
+        "telegram_chatid": session_id,
     })
     ai_response = res["messages"][-1].content
 
@@ -42,7 +56,12 @@ async def send_message(session_id: str, body: ChatRequest):
         {"content": ai_response, "role": "AI"},
     ])
 
-    return {"reply": ai_response}
+    images = [
+        {"id": image_id, "url": f"/chat/schedule/{image_id}.png"}
+        for image_id in take_session_images(session_id)
+    ]
+
+    return {"reply": ai_response, "images": images}
 
 
 @router.post("/{session_id}/reset")

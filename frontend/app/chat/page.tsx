@@ -10,6 +10,7 @@ const BACKEND_URL =
 interface Message {
   role: "user" | "agent";
   content: string;
+  images?: { id: string; url: string }[];
 }
 
 function renderContent(html: string) {
@@ -67,7 +68,11 @@ export default function ChatPage() {
       const data = await res.json();
       setMessages((m) => [
         ...m,
-        { role: "agent", content: data.reply ?? "" },
+        {
+          role: "agent",
+          content: data.reply ?? "",
+          images: data.images ?? [],
+        },
       ]);
     } catch (err) {
       setMessages((m) => [
@@ -89,8 +94,7 @@ export default function ChatPage() {
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4">
           <Link
             href="/"
-            className="flex items-center gap-3 transition-opacity hover:opacity-80"
-          >
+            className="flex items-center gap-3 transition-opacity hover:opacity-80">
             <Scissors className="text-[#d4af37]" size={22} />
             <span className="text-lg font-bold uppercase italic tracking-tighter">
               Silver <span className="text-[#d4af37]">Blade</span> AI Assistant
@@ -98,8 +102,7 @@ export default function ChatPage() {
           </Link>
           <button
             onClick={createSession}
-            className="flex items-center gap-2 rounded-sm border border-white/10 px-3 py-2 text-sm font-bold uppercase tracking-widest text-[#d4af37] transition-colors hover:bg-white/5"
-          >
+            className="flex items-center gap-2 rounded-sm border border-white/10 px-3 py-2 text-sm font-bold uppercase tracking-widest text-[#d4af37] transition-colors hover:bg-white/5">
             <Plus size={16} /> New chat
           </button>
         </div>
@@ -122,16 +125,26 @@ export default function ChatPage() {
               key={i}
               className={`flex ${
                 m.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
+              }`}>
               <div
                 className={`max-w-[85%] rounded-sm px-4 py-3 text-[15px] leading-relaxed ${
                   m.role === "user"
                     ? "bg-[#d4af37] text-black"
                     : "border border-white/10 bg-white/5 text-[#ededed]"
-                }`}
-              >
+                }`}>
                 <div dangerouslySetInnerHTML={renderContent(m.content)} />
+                {m.images && m.images.length > 0 && (
+                  <div className="mt-3 space-y-3">
+                    {m.images.map((img) => (
+                      <img
+                        key={img.id}
+                        src={`${BACKEND_URL}${img.url}`}
+                        alt="Available schedule"
+                        className="w-full mt-3 max-w-md rounded-sm border border-white/10 bg-white"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -156,8 +169,7 @@ export default function ChatPage() {
               e.preventDefault();
               send();
             }}
-            className="flex items-center gap-2"
-          >
+            className="flex items-center gap-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -167,8 +179,7 @@ export default function ChatPage() {
             <button
               type="submit"
               disabled={!input.trim() || loading}
-              className="rounded-sm bg-[#d4af37] px-5 py-3 font-bold uppercase tracking-widest text-black transition-all hover:bg-[#b8962d] disabled:cursor-not-allowed disabled:opacity-40"
-            >
+              className="rounded-sm bg-[#d4af37] px-5 py-3 font-bold uppercase tracking-widest text-black transition-all hover:bg-[#b8962d] disabled:cursor-not-allowed disabled:opacity-40">
               <Send size={18} />
             </button>
           </form>
