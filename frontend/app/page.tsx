@@ -1,14 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Scissors,
-  User,
-  Clock,
-  MapPin,
-  Phone,
-  Star,
-} from "lucide-react";
+import { Scissors, User, Clock, MapPin, Phone, Star } from "lucide-react";
 import Navbar from "./components/Navbar";
 
 export const metadata = {
@@ -37,7 +30,7 @@ export default function LandingPage() {
             </div>
             <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic mb-6 leading-tight animate-slide-up">
               Precision <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4af37] via-[#f5e1a4] to-[#d4af37]">
+              <span className="text-transparent block w-full bg-clip-text bg-linear-to-r from-[#d4af37] via-[#f5e1a4] to-[#d4af37]">
                 Meets Style
               </span>
             </h1>
