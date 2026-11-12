@@ -241,15 +241,10 @@ dependencies = [
     { name = "chromadb" },
     { name = "dotenv" },
     { name = "fastapi" },
-    { name = "ipykernel" },
     { name = "langchain" },
     { name = "langchain-chroma" },
-    { name = "langchain-community" },
     { name = "langchain-openai" },
-    { name = "langchain-postgres" },
-    { name = "langchain-text-splitters" },
     { name = "langgraph" },
-    { name = "matplotlib" },
     { name = "pandas" },
     { name = "pydantic-settings" },
     { name = "pyjwt" },
@@ -262,6 +257,15 @@ dependencies = [
     { name = "uvicorn" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "ipykernel" },
+    { name = "langchain-community" },
+    { name = "langchain-postgres" },
+    { name = "langchain-text-splitters" },
+    { name = "matplotlib" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "arq", specifier = ">=0.28.0" },
@@ -269,15 +273,10 @@ requires-dist = [
     { name = "chromadb", specifier = ">=1.5.8" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "fastapi", specifier = ">=0.135.3" },
-    { name = "ipykernel", specifier = ">=7.2.0" },
     { name = "langchain", specifier = ">=1.2.15" },
     { name = "langchain-chroma", specifier = ">=1.1.0" },
-    { name = "langchain-community", specifier = ">=0.4.1" },
     { name = "langchain-openai", specifier = ">=1.1.0" },
-    { name = "langchain-postgres", specifier = ">=0.0.17" },
-    { name = "langchain-text-splitters", specifier = ">=1.1.2" },
     { name = "langgraph", specifier = ">=1.1.6" },
-    { name = "matplotlib", specifier = ">=3.10.9" },
     { name = "pandas", specifier = ">=3.0.2" },
     { name = "pydantic-settings", specifier = ">=2.0.0" },
     { name = "pyjwt", specifier = ">=2.12.1" },
@@ -288,6 +287,15 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=2.0.0" },
     { name = "stripe", specifier = ">=15.0.1" },
     { name = "uvicorn", specifier = ">=0.44.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "ipykernel", specifier = ">=7.2.0" },
+    { name = "langchain-community", specifier = ">=0.4.1" },
+    { name = "langchain-postgres", specifier = ">=0.0.17" },
+    { name = "langchain-text-splitters", specifier = ">=1.1.2" },
+    { name = "matplotlib", specifier = ">=3.10.9" },
 ]
 
 [[package]]
