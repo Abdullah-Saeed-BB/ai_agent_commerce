@@ -154,3 +154,9 @@ docker run -d -p 8000:8001 --name commerce-chroma chromadb/chroma
 ```
 
 > **Note:** If layout rendering components fail or break after authorization changes, delete the local compiler caches via `rm -rf .next node_modules` and run a clean `npm install`.
+
+## Screenshots
+
+<img width="1920" height="1080" alt="AI Agent conversations 3 images" src="https://github.com/user-attachments/assets/a2b59ff4-698b-4d8c-9d3b-caa2697a320f" />
+<img width="1920" height="1080" alt="Web application 3 images" src="https://github.com/user-attachments/assets/0f310615-a7bd-4c4f-8517-a2e4a6cd35fa" />
+<img width="1920" height="1080" alt="Dashboard page" src="https://github.com/user-attachments/assets/7100a89c-c818-4476-b945-faba0c66e328" />
