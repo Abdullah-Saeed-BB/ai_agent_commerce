@@ -12,6 +12,7 @@ load_dotenv()
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Redis/ARQ is optional. When it's missing, the app still boots and the
