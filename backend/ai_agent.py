@@ -83,7 +83,6 @@ class AIAgent:
         # print("Creating Vector Store ...")
         vector_store = Chroma(
             client=client,
-            persist_directory=PERSIST_DIRECTORY,
             collection_name="silver-blade-vdb",
             embedding_function=embedding_function
         )
