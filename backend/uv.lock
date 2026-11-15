@@ -245,6 +245,7 @@ dependencies = [
     { name = "langchain-chroma" },
     { name = "langchain-openai" },
     { name = "langgraph" },
+    { name = "matplotlib" },
     { name = "pandas" },
     { name = "pydantic-settings" },
     { name = "pyjwt" },
@@ -263,7 +264,6 @@ dev = [
     { name = "langchain-community" },
     { name = "langchain-postgres" },
     { name = "langchain-text-splitters" },
-    { name = "matplotlib" },
 ]
 
 [package.metadata]
@@ -277,6 +277,7 @@ requires-dist = [
     { name = "langchain-chroma", specifier = ">=1.1.0" },
     { name = "langchain-openai", specifier = ">=1.1.0" },
     { name = "langgraph", specifier = ">=1.1.6" },
+    { name = "matplotlib", specifier = ">=3.10.9" },
     { name = "pandas", specifier = ">=3.0.2" },
     { name = "pydantic-settings", specifier = ">=2.0.0" },
     { name = "pyjwt", specifier = ">=2.12.1" },
@@ -295,7 +296,6 @@ dev = [
     { name = "langchain-community", specifier = ">=0.4.1" },
     { name = "langchain-postgres", specifier = ">=0.0.17" },
     { name = "langchain-text-splitters", specifier = ">=1.1.2" },
-    { name = "matplotlib", specifier = ">=3.10.9" },
 ]
 
 [[package]]

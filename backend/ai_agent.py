@@ -63,8 +63,9 @@ class AIAgent:
 
         VDB_HOST = os.getenv("VDB_HOST")
         VDB_PORT = os.getenv("VDB_PORT")
+        VDB_SSL = os.getenv("VDB_SSL").lower() == "true"
 
-        client = chromadb.HttpClient(host=VDB_HOST, port=VDB_PORT)
+        client = chromadb.HttpClient(host=VDB_HOST, port=VDB_PORT, ssl=VDB_SSL)
 
         OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
         openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
