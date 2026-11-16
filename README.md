@@ -1,4 +1,6 @@
-# AI Agent Commerce
+<h1 align="center">AI Agent Commerce</h1>
+<img width="2560" height="608" alt="Repo Banner" src="https://github.com/user-attachments/assets/05b323a1-00ad-4cdb-9a1f-e5a19067e156" />
+
 
 AI Agent Commerce is an AI-powered conversational commerce and booking system designed to automate appointments, handle payments, and manage schedules seamlessly through messaging platforms.
 
